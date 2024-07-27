@@ -36,4 +36,12 @@ impl FrameBuffer {
     pub fn set_current_color(&mut self, color: u32) {
         self.current_color = color;
     }
+
+    pub fn get_background_color(&self) -> u32 {
+        self.background_color
+    }
+
+    pub fn get_current_color(&self) -> u32 {
+        self.current_color
+    }
 }
