@@ -10,11 +10,11 @@ impl Pattern {
         Pattern { name, coordinates }
     }
 
-    pub fn draw(&self, framebuffer: &mut FrameBuffer, scale: usize) {
+    pub fn draw(&self, framebuffer: &mut FrameBuffer,) {
         for &(x, y) in &self.coordinates {
-            for i in 0..scale {
-                for j in 0..scale {
-                    framebuffer.point(x * scale + i, y * scale + j);
+            for i in 0..8 {
+                for j in 0..8 {
+                    framebuffer.point(x * 8 + i, y * 8 + j);
                 }
             }
         }

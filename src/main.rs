@@ -3,26 +3,22 @@ mod framebuffer;
 mod pattern;
 
 use framebuffer::FrameBuffer;
+use minifb::{Key, Window, WindowOptions};
 use pattern::Pattern;
 use std::thread::sleep;
 use std::time::Duration;
-use minifb::{Key, Window, WindowOptions};
 
 fn main() {
-    let width = 100;
-    let height = 100;
+    let width = 500;
+    let height = 500;
     let mut framebuffer = FrameBuffer::new(width, height);
 
     // Define patterns
-    let patterns = vec![
-        Pattern::new("Block", vec![(1, 1), (1, 2), (2, 1), (2, 2)]),
-        
-    ];
+    let patterns = vec![Pattern::new("Block", vec![(1, 1), (1, 2), (2, 1), (2, 2)])];
 
     // Draw each pattern scaled
-    let scale = 1; // Scaling factor
     for pattern in &patterns {
-        pattern.draw(&mut framebuffer, scale);
+        pattern.draw(&mut framebuffer);
     }
 
     let mut window = Window::new(
@@ -76,17 +72,22 @@ fn count_alive_neighbors(framebuffer: &FrameBuffer, x: usize, y: usize) -> usize
     let width = framebuffer.width;
     let height = framebuffer.height;
     let directions = [
-        (-1, -1), (0, -1), (1, -1),
-        (-1, 0),         (1, 0),
-        (-1, 1), (0, 1), (1, 1),
+        (-1, -1),
+        (0, -1),
+        (1, -1),
+        (-1, 0),
+        (1, 0),
+        (-1, 1),
+        (0, 1),
+        (1, 1),
     ];
 
     for &(dx, dy) in &directions {
-        let nx = x as isize + dx;
-        let ny = y as isize + dy;
+        let nx = (x as isize + dx * 8) as usize;
+        let ny = (y as isize + dy * 8) as usize;
 
-        if nx >= 0 && nx < width as isize && ny >= 0 && ny < height as isize {
-            let nidx = ny as usize * width + nx as usize;
+        if nx < width && ny < height {
+            let nidx = ny * width + nx;
             if framebuffer.buffer[nidx] == framebuffer.get_current_color() {
                 count += 1;
             }
