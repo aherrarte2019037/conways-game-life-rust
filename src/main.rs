@@ -1,44 +1,48 @@
-mod framebuffer;
 mod bmp;
+mod framebuffer;
 mod pattern;
 
 use framebuffer::FrameBuffer;
-use bmp::WriteBmp;
+use pattern::Pattern;
 use std::thread::sleep;
 use std::time::Duration;
+use minifb::{Key, Window, WindowOptions};
 
 fn main() {
-    let mut framebuffer = FrameBuffer::new(500, 500); // Cambiar tamaño a 500x500
+    let width = 100;
+    let height = 100;
+    let mut framebuffer = FrameBuffer::new(width, height);
 
-    // Define initial pattern (glider example)
-    let initial_pattern = vec![
-        (1, 0), (2, 1), (0, 2), (1, 2), (2, 2)
+    // Define patterns
+    let patterns = vec![
+        Pattern::new("Block", vec![(1, 1), (1, 2), (2, 1), (2, 2)]),
+        
     ];
 
-    // Draw the initial pattern scaled
-    let scale = 8; // Scaling factor
-    draw_scaled_pattern(&mut framebuffer, &initial_pattern, scale);
+    // Draw each pattern scaled
+    let scale = 1; // Scaling factor
+    for pattern in &patterns {
+        pattern.draw(&mut framebuffer, scale);
+    }
 
-    // Number of iterations
-    let iterations = 100;
+    let mut window = Window::new(
+        "Conway's Game of Life",
+        width,
+        height,
+        WindowOptions::default(),
+    )
+    .unwrap_or_else(|e| {
+        panic!("{}", e);
+    });
 
-    for _ in 0..iterations {
-        framebuffer.render_buffer("out.bmp").unwrap();
+    while window.is_open() && !window.is_key_down(Key::Escape) {
+        framebuffer.render_buffer_to_window(&mut window);
         next_generation(&mut framebuffer);
+        window.update();
         sleep(Duration::from_millis(200));
     }
 
-    println!("Framebuffer rendered to output.bmp");
-}
-
-fn draw_scaled_pattern(framebuffer: &mut FrameBuffer, pattern: &Vec<(usize, usize)>, scale: usize) {
-    for &(x, y) in pattern {
-        for i in 0..scale {
-            for j in 0..scale {
-                framebuffer.point(x * scale + i, y * scale + j);
-            }
-        }
-    }
+    println!("Simulation ended.");
 }
 
 fn next_generation(framebuffer: &mut FrameBuffer) {

@@ -1,3 +1,5 @@
+use minifb::Window;
+
 pub struct FrameBuffer {
     pub width: usize,
     pub height: usize,
@@ -15,6 +17,12 @@ impl FrameBuffer {
             background_color: 0x000000,
             current_color: 0xFFFFFF,
         }
+    }
+
+    pub fn render_buffer_to_window(&self, window: &mut Window) {
+        window
+            .update_with_buffer(&self.buffer, self.width, self.height)
+            .unwrap();
     }
 
     pub fn clear(&mut self) {
